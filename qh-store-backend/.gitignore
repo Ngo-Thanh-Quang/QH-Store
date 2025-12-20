@@ -1,0 +1,5 @@
+node_modules
+dist
+.env
+ServiceAccount.json
+n8n-newversion.json
