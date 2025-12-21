@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { adminDb } from "../firebase";
+import { FieldValue } from "firebase-admin/firestore";
 import {
   makeAsciiWordRegex,
   makeUnicodeWordRegex,
@@ -7,6 +8,7 @@ import {
 } from "../utils/text";
 
 type SeverityEntry = {
+  id?: string;
   label?: string;
   phrases?: string[];
   ascii_phrases?: string[];
@@ -26,7 +28,7 @@ export const listSeverityKeywords = async (_req: Request, res: Response) => {
   }
 };
 
-export const checkSeverity = (req: Request, res: Response) => {
+export const checkSeverity = async (req: Request, res: Response) => {
   const rawText =
     req.body?.text ||
     req.body?.message?.text ||
@@ -54,11 +56,12 @@ export const checkSeverity = (req: Request, res: Response) => {
     );
   }
 
-  const unicodePatterns: Array<{ label: string; rx: RegExp }> = [];
-  const asciiPatterns: Array<{ label: string; rx: RegExp }> = [];
+  const unicodePatterns: Array<{ id?: string; label: string; rx: RegExp }> = [];
+  const asciiPatterns: Array<{ id?: string; label: string; rx: RegExp }> = [];
 
   for (const entry of entries) {
     const label = entry.label || "";
+    const id = entry.id;
     const unicodeList = (entry.phrases?.length
       ? entry.phrases
       : [label]
@@ -69,33 +72,47 @@ export const checkSeverity = (req: Request, res: Response) => {
     ).filter(Boolean);
 
     for (const phrase of unicodeList) {
-      unicodePatterns.push({ label, rx: makeUnicodeWordRegex(phrase) });
+      unicodePatterns.push({ id, label, rx: makeUnicodeWordRegex(phrase) });
     }
     for (const phrase of asciiList) {
-      asciiPatterns.push({ label, rx: makeAsciiWordRegex(phrase) });
+      asciiPatterns.push({ id, label, rx: makeAsciiWordRegex(phrase) });
     }
   }
 
   let keyword = "";
   let matched = "";
+  let matchedId = "";
 
-  for (const { rx, label } of unicodePatterns) {
+  for (const { rx, label, id } of unicodePatterns) {
     const match = lower.match(rx);
     if (match) {
       keyword = label;
       matched = match[1] || match[0];
+      matchedId = id || "";
       break;
     }
   }
 
   if (!keyword) {
-    for (const { rx, label } of asciiPatterns) {
+    for (const { rx, label, id } of asciiPatterns) {
       const match = ascii.match(rx);
       if (match) {
         keyword = label;
         matched = match[1] || match[0];
+        matchedId = id || "";
         break;
       }
+    }
+  }
+
+  if (matchedId) {
+    try {
+      await adminDb
+        .collection("severity_keywords")
+        .doc(matchedId)
+        .update({ asked: FieldValue.increment(1) });
+    } catch {
+      // Non-blocking: do not fail response when asked counter update fails.
     }
   }
 
