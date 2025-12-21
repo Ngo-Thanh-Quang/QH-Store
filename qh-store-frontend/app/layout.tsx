@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -17,23 +18,27 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "QH Store",
-  description: "QH Store - Thoi trang va phu kien chinh hang",
+  description: "QH Store - Thời trang tinh tế, sang trọng",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerStore = await headers();
+  const pathname = headerStore.get("x-pathname") || "";
+  const isAdminRoute = pathname.startsWith("/admin");
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
+        {!isAdminRoute && <Navbar />}
         {children}
-        <Footer />
-        <ChatBubble />
+        {!isAdminRoute && <Footer />}
+        {!isAdminRoute && <ChatBubble />}
       </body>
     </html>
   );
