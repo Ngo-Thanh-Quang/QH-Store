@@ -83,7 +83,10 @@ export default function Navbar() {
               <path d="M20 20l-3.5-3.5" />
             </svg>
           </label>
-          <button className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 text-black/70 transition hover:border-black/20 hover:text-black">
+          <Link
+            href="/cart"
+            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 text-black/70 transition hover:border-black/20 hover:text-black"
+          >
             <span className="sr-only">Giỏ hàng</span>
             <svg
               viewBox="0 0 24 24"
@@ -97,10 +100,7 @@ export default function Navbar() {
               <circle cx="18" cy="20" r="1" />
               <path d="M6 6L4 3H2" />
             </svg>
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] text-white">
-              2
-            </span>
-          </button>
+          </Link>
           <button className="h-9 rounded-full bg-black px-4 text-sm font-medium text-white transition hover:bg-black/90">
             Đăng nhập
           </button>
@@ -141,9 +141,12 @@ export default function Navbar() {
               <path d="M20 20l-3.5-3.5" />
             </svg>
           </label>
-          <button className="h-10 w-full rounded-full border border-black/10 text-sm font-medium text-black transition hover:border-black/20">
-            Gio hang (2)
-          </button>
+          <Link
+            href="/cart"
+            className="h-10 w-full rounded-full border border-black/10 text-center text-sm font-medium text-black transition hover:border-black/20"
+          >
+            Gio hang
+          </Link>
           <button className="h-10 w-full rounded-full bg-black text-sm font-medium text-white transition hover:bg-black/90">
             Dang nhap
           </button>
