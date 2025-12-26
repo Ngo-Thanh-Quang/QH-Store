@@ -37,6 +37,10 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+app.get("/", (_req, res) => {
+  res.json({ message: "API is running..." });
+});
+
 // Routes
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
