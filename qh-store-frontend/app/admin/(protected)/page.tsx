@@ -61,6 +61,7 @@ export default async function AdminDashboardPage() {
           <div className="mt-4 space-y-3 text-sm">
             <Link
               href="/"
+              target="_blank"
               className="block rounded-2xl border border-black/10 px-4 py-3 text-black transition hover:border-black/30"
             >
               Đến cửa hàng
