@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { adminDb as db } from '../firebase';
 
-// 1. Định nghĩa lại các Interface chuẩn xác
 interface OrderItem {
   name: string;
   quantity: number;
@@ -36,17 +35,15 @@ export const getWeeklyRevenue = async (req: Request, res: Response) => {
     endOfWeek.setDate(endOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
 
-    // 2. Query Firestore
     const snapshot = await db.collection("orders")
       .where("created_at", ">=", startOfWeek)
       .where("created_at", "<=", endOfWeek)
       .get();
 
     let totalRevenue = 0;
-    // Khởi tạo an toàn
     let topOrder: TopOrder = { order_id: "N/A", total_amount: 0, items: [] };
     const productMap = new Map<string, { name: string; quantity: number }>();
-    const allOrders: SimplifiedOrder[] = []; // Để return mảng orders cho n8n
+    const allOrders: SimplifiedOrder[] = []; /
 
     snapshot.docs.forEach((doc) => {
       const data = doc.data();
@@ -55,14 +52,12 @@ export const getWeeklyRevenue = async (req: Request, res: Response) => {
 
       totalRevenue += amount;
 
-      // Lưu vào danh sách đơn hàng tổng quát
       allOrders.push({
         order_id: data.order_id || doc.id,
         total_amount: amount,
         item_count: rawItems.length
       });
 
-      // 3. Tìm Top Order (Xử lý sâu vào item.product.quantity)
       if (amount > topOrder.total_amount) {
         topOrder = {
           order_id: data.order_id || doc.id,
@@ -78,7 +73,6 @@ export const getWeeklyRevenue = async (req: Request, res: Response) => {
         };
       }
 
-      // 4. Cộng dồn Top Product
       rawItems.forEach((item: any) => {
         const p = item.product || {};
         const id = p.id || "N/A";
@@ -94,7 +88,7 @@ export const getWeeklyRevenue = async (req: Request, res: Response) => {
       });
     });
 
-    // 5. Xác định Top Product
+    // Top Product
     let topProduct = { product_id: "N/A", name: "Không có", quantity: 0 };
     if (productMap.size > 0) {
       const sorted = Array.from(productMap.entries()).sort((a, b) => b[1].quantity - a[1].quantity);
@@ -107,7 +101,7 @@ export const getWeeklyRevenue = async (req: Request, res: Response) => {
       total_revenue: totalRevenue,
       topOrder,
       topProduct,
-      orders: allOrders, // Trả về mảng để render bảng
+      orders: allOrders,
       week_start: startOfWeek,
       week_end: endOfWeek
     });
