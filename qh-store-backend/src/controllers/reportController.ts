@@ -43,7 +43,7 @@ export const getWeeklyRevenue = async (req: Request, res: Response) => {
     let totalRevenue = 0;
     let topOrder: TopOrder = { order_id: "N/A", total_amount: 0, items: [] };
     const productMap = new Map<string, { name: string; quantity: number }>();
-    const allOrders: SimplifiedOrder[] = []; /
+    const allOrders: SimplifiedOrder[] = [];
 
     snapshot.docs.forEach((doc) => {
       const data = doc.data();
