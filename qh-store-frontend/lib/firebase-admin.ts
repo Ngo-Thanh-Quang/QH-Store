@@ -6,13 +6,14 @@ import type { ServiceAccount } from "firebase-admin/app";
 import fs from "fs";
 import path from "path";
 
+const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 const serviceAccountPath =
   process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
   path.join(process.cwd(), "ServiceAccount.json");
 
-const serviceAccount = JSON.parse(
-  fs.readFileSync(serviceAccountPath, "utf8")
-) as ServiceAccount;
+const serviceAccount = serviceAccountJson
+  ? (JSON.parse(serviceAccountJson) as ServiceAccount)
+  : (JSON.parse(fs.readFileSync(serviceAccountPath, "utf8")) as ServiceAccount);
 
 const app = getApps().length
   ? getApps()[0]
